@@ -1,0 +1,42 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── ADMINS ────────────────────────────────────
+    // Admins can read/write their own profile
+    match /admins/{adminId} {
+      allow read, write: if request.auth != null && request.auth.uid == adminId;
+    }
+
+    // ─── TRIPS ─────────────────────────────────────
+    // Admin can CRUD their trips; anyone with trip code can read
+    match /trips/{tripId} {
+      allow read: if true; // Members need to read by tripCode
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null
+        && resource.data.adminId == request.auth.uid;
+    }
+
+    // ─── MEMBERS ───────────────────────────────────
+    // Admin can CRUD members; anyone can read (for member view)
+    match /members/{memberId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    // ─── EXPENSES ──────────────────────────────────
+    // Admin can CRUD expenses; anyone can read
+    match /expenses/{expenseId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    // ─── PAYMENTS ──────────────────────────────────
+    // Admin can CRUD payments; anyone can read
+    match /payments/{paymentId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+  }
+}

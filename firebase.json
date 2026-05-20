@@ -1,0 +1,28 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "tracktrip-3283c",
+          "appId": "1:815122867971:android:e7fa24bbd5b6e8865bab36",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "tracktrip-3283c",
+          "configurations": {
+            "android": "1:815122867971:android:e7fa24bbd5b6e8865bab36",
+            "ios": "1:815122867971:ios:6b3477bc20b67d075bab36",
+            "macos": "1:815122867971:ios:6b3477bc20b67d075bab36",
+            "web": "1:815122867971:web:59f506743caf84215bab36",
+            "windows": "1:815122867971:web:56bebf085d65e6835bab36"
+          }
+        }
+      }
+    }
+  }
+}
