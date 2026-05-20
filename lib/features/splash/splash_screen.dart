@@ -39,26 +39,34 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     // Navigate after delay
     Future.delayed(const Duration(seconds: 2), () async {
       if (!mounted) return;
+      final prefs = ref.read(sharedPreferencesProvider);
+      final isAdminLoggedIn = prefs.getBool('admin_logged_in') ?? false;
       final user = ref.read(authStateProvider).value;
       final memberSession = ref.read(memberSessionProvider);
-      if (user != null) {
-        try {
-          final snap = await FirebaseFirestore.instance
-              .collection('trips')
-              .where('adminId', isEqualTo: user.uid)
-              .limit(1)
-              .get();
-          if (!mounted) return;
-          if (snap.docs.isNotEmpty) {
-            final tripId = snap.docs.first.id;
-            ref.read(selectedTripIdProvider.notifier).state = tripId;
-            context.go('/home');
-          } else {
-            context.go('/create-trip');
+
+      if (user != null || isAdminLoggedIn) {
+        final uid = user?.uid ?? prefs.getString('admin_uid');
+        if (uid != null) {
+          try {
+            final snap = await FirebaseFirestore.instance
+                .collection('trips')
+                .where('adminId', isEqualTo: uid)
+                .limit(1)
+                .get();
+            if (!mounted) return;
+            if (snap.docs.isNotEmpty) {
+              final tripId = snap.docs.first.id;
+              ref.read(selectedTripIdProvider.notifier).state = tripId;
+              context.go('/home');
+            } else {
+              context.go('/create-trip');
+            }
+            return;
+          } catch (e) {
+            // fallback
           }
-        } catch (e) {
-          if (mounted) context.go('/login');
         }
+        context.go('/home');
       } else if (memberSession != null) {
         context.go('/member-dashboard');
       } else {

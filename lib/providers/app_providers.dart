@@ -13,6 +13,14 @@ import 'package:track_tripp/data/services/auth_service.dart';
 /// Currently selected trip ID
 final selectedTripIdProvider = StateProvider<String?>((ref) => null);
 
+/// Active trip ID (either admin selected trip or logged in member trip)
+final activeTripIdProvider = Provider<String?>((ref) {
+  final adminSelectedId = ref.watch(selectedTripIdProvider);
+  if (adminSelectedId != null) return adminSelectedId;
+  final memberSession = ref.watch(memberSessionProvider);
+  return memberSession?.tripId;
+});
+
 /// Stream all trips for the current admin
 final tripsProvider = StreamProvider<List<TripModel>>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -23,7 +31,7 @@ final tripsProvider = StreamProvider<List<TripModel>>((ref) {
 
 /// Stream the currently selected trip
 final currentTripProvider = StreamProvider<TripModel?>((ref) {
-  final tripId = ref.watch(selectedTripIdProvider);
+  final tripId = ref.watch(activeTripIdProvider);
   if (tripId == null) return const Stream.empty();
   return ref.watch(firestoreServiceProvider).streamTrip(tripId);
 });
@@ -32,7 +40,7 @@ final currentTripProvider = StreamProvider<TripModel?>((ref) {
 
 /// Stream members for the selected trip
 final membersProvider = StreamProvider<List<MemberModel>>((ref) {
-  final tripId = ref.watch(selectedTripIdProvider);
+  final tripId = ref.watch(activeTripIdProvider);
   if (tripId == null) return const Stream.empty();
   return ref.watch(firestoreServiceProvider).streamMembers(tripId);
 });
@@ -78,7 +86,7 @@ final filteredMembersProvider = Provider<List<MemberModel>>((ref) {
 
 /// Stream expenses for the selected trip
 final expensesProvider = StreamProvider<List<ExpenseModel>>((ref) {
-  final tripId = ref.watch(selectedTripIdProvider);
+  final tripId = ref.watch(activeTripIdProvider);
   if (tripId == null) return const Stream.empty();
   return ref.watch(firestoreServiceProvider).streamExpenses(tripId);
 });
@@ -142,7 +150,7 @@ final filteredExpensesProvider = Provider<List<ExpenseModel>>((ref) {
 
 /// Stream payments for the selected trip
 final paymentsProvider = StreamProvider<List<PaymentModel>>((ref) {
-  final tripId = ref.watch(selectedTripIdProvider);
+  final tripId = ref.watch(activeTripIdProvider);
   if (tripId == null) return const Stream.empty();
   return ref.watch(firestoreServiceProvider).streamPayments(tripId);
 });

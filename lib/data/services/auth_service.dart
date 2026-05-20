@@ -62,14 +62,31 @@ final authServiceProvider = Provider<AuthService>((ref) {
 /// Notifier to manage local authentication state
 class LocalAuthNotifier extends StateNotifier<AsyncValue<LocalUser?>> {
   final AuthService _authService;
+  final SharedPreferences _prefs;
 
-  LocalAuthNotifier(this._authService)
-      : super(AsyncValue.data(_authService.currentUser));
+  LocalAuthNotifier(this._authService, this._prefs)
+      : super(AsyncValue.data(_authService.currentUser)) {
+    _init();
+  }
+
+  void _init() {
+    final user = _authService.currentUser;
+    if (user != null) {
+      _prefs.setBool('admin_logged_in', true);
+      _prefs.setString('admin_uid', user.uid);
+      _prefs.setString('admin_email', user.email);
+    }
+  }
 
   Future<void> signIn(String email, String password) async {
     state = const AsyncValue.loading();
     try {
       final user = await _authService.signIn(email, password);
+      if (user != null) {
+        await _prefs.setBool('admin_logged_in', true);
+        await _prefs.setString('admin_uid', user.uid);
+        await _prefs.setString('admin_email', user.email);
+      }
       state = AsyncValue.data(user);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -80,6 +97,9 @@ class LocalAuthNotifier extends StateNotifier<AsyncValue<LocalUser?>> {
   Future<void> signOut() async {
     state = const AsyncValue.loading();
     await _authService.signOut();
+    await _prefs.remove('admin_logged_in');
+    await _prefs.remove('admin_uid');
+    await _prefs.remove('admin_email');
     state = const AsyncValue.data(null);
   }
 }
@@ -88,5 +108,6 @@ class LocalAuthNotifier extends StateNotifier<AsyncValue<LocalUser?>> {
 final authStateProvider =
     StateNotifierProvider<LocalAuthNotifier, AsyncValue<LocalUser?>>((ref) {
       final authService = ref.watch(authServiceProvider);
-      return LocalAuthNotifier(authService);
+      final prefs = ref.watch(sharedPreferencesProvider);
+      return LocalAuthNotifier(authService, prefs);
     });

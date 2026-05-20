@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/formatters.dart';
@@ -58,157 +59,225 @@ class MemberDashboardScreen extends ConsumerWidget {
                 );
               }
 
-              return RefreshIndicator(
-                onRefresh: () async {
-                  ref.invalidate(currentTripProvider);
-                  ref.invalidate(expensesProvider);
-                  ref.invalidate(membersProvider);
-                },
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isWide
-                        ? MediaQuery.of(context).size.width * 0.1
-                        : 20,
-                    vertical: 16,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header
-                      Row(
-                        children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
+              final horizontalPadding = isWide
+                  ? MediaQuery.of(context).size.width * 0.1
+                  : 20.0;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Fixed Header at top (does not scroll)
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      horizontalPadding,
+                      16,
+                      horizontalPadding,
+                      8,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              session.memberName[0].toUpperCase(),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(color: AppColors.primary),
                             ),
-                            child: Center(
-                              child: Text(
-                                session.memberName[0].toUpperCase(),
-                                style: Theme.of(context).textTheme.titleLarge
-                                    ?.copyWith(color: AppColors.primary),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Hi, ${session.memberName}',
+                                style: Theme.of(context).textTheme.headlineMedium,
                               ),
-                            ),
+                              Text(
+                                trip.name,
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Hi, ${session.memberName}',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.headlineMedium,
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                Text(
-                                  trip.name,
-                                  style: Theme.of(context).textTheme.bodySmall,
+                                title: Text(
+                                  'Leave Trip?',
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () async {
+                                content: Text(
+                                  'Are you sure you want to log out and leave this trip session?',
+                                  style: GoogleFonts.inter(fontSize: 14),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () => Navigator.pop(ctx, true),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.error,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: const Text('Leave'),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (confirm == true) {
                               await ref
                                   .read(memberSessionProvider.notifier)
                                   .clearSession();
                               ref.read(selectedTripIdProvider.notifier).state =
                                   null;
-                              if (context.mounted) context.go('/member-login');
-                            },
-                            icon: const Icon(Icons.logout_rounded, size: 22),
-                            style: IconButton.styleFrom(
-                              backgroundColor: AppColors.surface,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                              if (context.mounted) {
+                                context.go('/member-login');
+                              }
+                            }
+                          },
+                          icon: const Icon(Icons.logout_rounded, size: 22),
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppColors.surface,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      // Trip image banner
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 12),
-                        height: 100,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: AppColors.cardShadow,
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              CachedNetworkImage(
-                                imageUrl: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&h=200&fit=crop',
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => Container(
-                                  decoration: const BoxDecoration(
-                                    gradient: AppColors.heroGradient,
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Container(
-                                  decoration: const BoxDecoration(
-                                    gradient: AppColors.heroGradient,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.black.withValues(alpha: 0.5),
-                                      Colors.black.withValues(alpha: 0.1),
-                                    ],
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                  ),
+                      ],
+                    ),
+                  ),
+
+                  // Fixed Trip image banner (does not scroll)
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      height: 100,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: AppColors.cardShadow,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            CachedNetworkImage(
+                              imageUrl:
+                                  'https://kanyakumaritouristplaces.com/wp-content/uploads/2025/06/Kodaikanal.webp',
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                decoration: const BoxDecoration(
+                                  gradient: AppColors.heroGradient,
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(14),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.location_on_rounded, size: 14, color: Colors.white),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          trip.location,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        Text(
-                                          Formatters.dateRange(
-                                            trip.startDate,
-                                            trip.endDate,
-                                          ),
-                                          style: TextStyle(
-                                            color: Colors.white.withValues(alpha: 0.8),
-                                            fontSize: 11,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                              errorWidget: (context, url, error) => Container(
+                                decoration: const BoxDecoration(
+                                  gradient: AppColors.heroGradient,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.black.withValues(alpha: 0.5),
+                                    Colors.black.withValues(alpha: 0.1),
                                   ],
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.location_on_rounded,
+                                        size: 14,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        trip.location,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Text(
+                                        Formatters.dateRange(
+                                          trip.startDate,
+                                          trip.endDate,
+                                        ),
+                                        style: TextStyle(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.8,
+                                          ),
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      // Stats
+                    ),
+                  ),
+
+                  // Scrollable Body Content below the Fixed Header and Banner
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        ref.invalidate(currentTripProvider);
+                        ref.invalidate(expensesProvider);
+                        ref.invalidate(membersProvider);
+                      },
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.fromLTRB(
+                          horizontalPadding,
+                          4,
+                          horizontalPadding,
+                          16,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Stats
                       GridView.count(
                         crossAxisCount: isWide ? 4 : 2,
                         shrinkWrap: true,
@@ -309,9 +378,7 @@ class MemberDashboardScreen extends ConsumerWidget {
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: statusColor.withValues(
-                                        alpha: 0.1,
-                                      ),
+                                      color: statusColor.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -382,7 +449,10 @@ class MemberDashboardScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-              );
+              ),
+            ),
+          ],
+        );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(child: Text('Error: $e')),

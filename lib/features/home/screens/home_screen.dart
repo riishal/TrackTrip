@@ -60,8 +60,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             index: _currentIndex,
             children: [
               AnalyticsScreen(tripId: trip.id),
-              MembersScreen(tripId: trip.id),
+
               ExpensesScreen(tripId: trip.id),
+              MembersScreen(tripId: trip.id),
             ],
           ),
           bottomNavigationBar: _ModernBottomNav(
@@ -85,13 +86,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline_rounded,
-                  size: 48, color: AppColors.error),
+              const Icon(
+                Icons.error_outline_rounded,
+                size: 48,
+                color: AppColors.error,
+              ),
               const SizedBox(height: 12),
               Text(
                 'Something went wrong',
                 style: GoogleFonts.inter(
-                    color: AppColors.textSecondary, fontSize: 16),
+                  color: AppColors.textSecondary,
+                  fontSize: 16,
+                ),
               ),
             ],
           ),
@@ -105,10 +111,7 @@ class _ModernBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  const _ModernBottomNav({
-    required this.currentIndex,
-    required this.onTap,
-  });
+  const _ModernBottomNav({required this.currentIndex, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -119,14 +122,14 @@ class _ModernBottomNav extends StatelessWidget {
         label: 'Dashboard',
       ),
       _NavItem(
-        icon: Icons.people_outline_rounded,
-        activeIcon: Icons.people_rounded,
-        label: 'Members',
-      ),
-      _NavItem(
         icon: Icons.receipt_long_outlined,
         activeIcon: Icons.receipt_long_rounded,
         label: 'Expenses',
+      ),
+      _NavItem(
+        icon: Icons.people_outline_rounded,
+        activeIcon: Icons.people_rounded,
+        label: 'Members',
       ),
     ];
 
@@ -161,7 +164,9 @@ class _ModernBottomNav extends StatelessWidget {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 8),
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? AppColors.primary.withValues(alpha: 0.08)
@@ -209,9 +214,5 @@ class _NavItem {
   final IconData activeIcon;
   final String label;
 
-  _NavItem({
-    required this.icon,
-    required this.activeIcon,
-    required this.label,
-  });
+  _NavItem({required this.icon, required this.activeIcon, required this.label});
 }

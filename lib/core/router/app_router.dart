@@ -21,6 +21,7 @@ import 'package:track_tripp/features/member_view/screens/member_dashboard_screen
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
   final memberSession = ref.watch(memberSessionProvider);
+  final prefs = ref.watch(sharedPreferencesProvider);
 
   return GoRouter(
     initialLocation: '/splash',
@@ -29,17 +30,29 @@ final routerProvider = Provider<GoRouter>((ref) {
       final user = authState.value;
       final hasMemberSession = memberSession != null;
       final currentPath = state.uri.path;
+      final isAdminLoggedIn = prefs.getBool('admin_logged_in') ?? false;
 
-      if (isLoading && currentPath != '/splash') return '/splash';
+      // If auth is loading but member session exists, allow access
+      if (isLoading && !hasMemberSession && currentPath != '/splash') {
+        return '/splash';
+      }
 
       if (currentPath == '/splash' && !isLoading) {
-        if (user != null) return '/home';
+        if (user != null || isAdminLoggedIn) return '/home';
         if (hasMemberSession) return '/member-dashboard';
         return '/login';
       }
 
+      // If already logged in, do not show login or member-login again
+      if ((user != null || isAdminLoggedIn) && (currentPath == '/login' || currentPath == '/member-login')) {
+        return '/home';
+      }
+      if (hasMemberSession && (currentPath == '/login' || currentPath == '/member-login')) {
+        return '/member-dashboard';
+      }
+
       // Admin user accessing member routes - redirect to home
-      if (user != null && currentPath == '/member-dashboard') {
+      if ((user != null || isAdminLoggedIn) && currentPath == '/member-dashboard') {
         return '/home';
       }
 
@@ -54,6 +67,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final authPaths = ['/login', '/member-login', '/splash'];
       if (user == null &&
+          !isAdminLoggedIn &&
           !hasMemberSession &&
           !authPaths.contains(currentPath)) {
         return '/login';

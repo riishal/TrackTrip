@@ -57,31 +57,41 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
               decoration: BoxDecoration(
                 color: AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(10),
-                border:
-                    Border.all(color: AppColors.border.withValues(alpha: 0.6)),
+                border: Border.all(
+                  color: AppColors.border.withValues(alpha: 0.6),
+                ),
               ),
-              child: const Icon(Icons.sort_rounded,
-                  size: 18, color: AppColors.textPrimary),
+              child: const Icon(
+                Icons.sort_rounded,
+                size: 18,
+                color: AppColors.textPrimary,
+              ),
             ),
-            onSelected: (v) =>
-                ref.read(expenseSortProvider.notifier).state = v,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            onSelected: (v) => ref.read(expenseSortProvider.notifier).state = v,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             itemBuilder: (_) => [
               PopupMenuItem(
                 value: 'date',
-                child: Text('Sort by Date',
-                    style: GoogleFonts.inter(fontSize: 13)),
+                child: Text(
+                  'Sort by Date',
+                  style: GoogleFonts.inter(fontSize: 13),
+                ),
               ),
               PopupMenuItem(
                 value: 'amount',
-                child: Text('Sort by Amount',
-                    style: GoogleFonts.inter(fontSize: 13)),
+                child: Text(
+                  'Sort by Amount',
+                  style: GoogleFonts.inter(fontSize: 13),
+                ),
               ),
               PopupMenuItem(
                 value: 'category',
-                child: Text('Sort by Category',
-                    style: GoogleFonts.inter(fontSize: 13)),
+                child: Text(
+                  'Sort by Category',
+                  style: GoogleFonts.inter(fontSize: 13),
+                ),
               ),
             ],
           ),
@@ -168,13 +178,17 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
             child: TextField(
               onChanged: (v) =>
                   ref.read(expenseSearchProvider.notifier).state = v,
-              style: GoogleFonts.inter(fontSize: 14, color: AppColors.textPrimary),
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: AppColors.textPrimary,
+              ),
               decoration: InputDecoration(
                 hintText: 'Search expenses...',
                 hintStyle: GoogleFonts.inter(
-                    fontSize: 14, color: AppColors.textMuted),
-                prefixIcon:
-                    const Icon(Icons.search_rounded, size: 20),
+                  fontSize: 14,
+                  color: AppColors.textMuted,
+                ),
+                prefixIcon: const Icon(Icons.search_rounded, size: 20),
                 suffixIcon: search.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear_rounded, size: 18),
@@ -183,7 +197,9 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                       )
                     : null,
                 contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 12),
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
             ),
           ),
@@ -202,9 +218,11 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: GestureDetector(
-                      onTap: () => ref
-                          .read(expenseCategoryFilterProvider.notifier)
-                          .state = c,
+                      onTap: () =>
+                          ref
+                                  .read(expenseCategoryFilterProvider.notifier)
+                                  .state =
+                              c,
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(
@@ -227,8 +245,9 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                           c == 'all' ? 'All' : c,
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            fontWeight:
-                                selected ? FontWeight.w700 : FontWeight.w500,
+                            fontWeight: selected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
                             color: selected
                                 ? chipColor
                                 : AppColors.textSecondary,
@@ -253,11 +272,11 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                     subtitle: search.isNotEmpty
                         ? 'Try a different search or filter'
                         : 'Start adding expenses to track spending',
-                    actionLabel: search.isEmpty ? 'Add Expense' : null,
-                    onAction: search.isEmpty
-                        ? () => context
-                            .push('/trip/${widget.tripId}/add-expense')
-                        : null,
+                    // actionLabel: search.isEmpty ? 'Add Expense' : null,
+                    // onAction: search.isEmpty
+                    //     ? () => context
+                    //         .push('/trip/${widget.tripId}/add-expense')
+                    //     : null,
                   );
                 }
                 return RefreshIndicator(
@@ -280,12 +299,16 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error_outline_rounded,
-                        size: 48, color: AppColors.textMuted),
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      size: 48,
+                      color: AppColors.textMuted,
+                    ),
                     const SizedBox(height: 12),
-                    Text('Something went wrong',
-                        style: GoogleFonts.inter(
-                            color: AppColors.textSecondary)),
+                    Text(
+                      'Something went wrong',
+                      style: GoogleFonts.inter(color: AppColors.textSecondary),
+                    ),
                   ],
                 ),
               ),
@@ -329,8 +352,7 @@ class _ExpenseCard extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.delete_rounded,
-                color: AppColors.error, size: 22),
+            const Icon(Icons.delete_rounded, color: AppColors.error, size: 22),
             const SizedBox(height: 4),
             Text(
               'Delete',
@@ -346,8 +368,10 @@ class _ExpenseCard extends ConsumerWidget {
       confirmDismiss: (_) async => await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text('Delete Expense?',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
+          title: Text(
+            'Delete Expense?',
+            style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+          ),
           content: Text(
             'Are you sure you want to delete "${expense.title}"?',
             style: GoogleFonts.inter(fontSize: 14),
@@ -359,8 +383,7 @@ class _ExpenseCard extends ConsumerWidget {
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(ctx, true),
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.error),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
               child: const Text('Delete'),
             ),
           ],
@@ -369,8 +392,7 @@ class _ExpenseCard extends ConsumerWidget {
       onDismissed: (_) =>
           ref.read(firestoreServiceProvider).deleteExpense(expense.id),
       child: GestureDetector(
-        onTap: () =>
-            context.push('/trip/$tripId/edit-expense/${expense.id}'),
+        onTap: () => context.push('/trip/$tripId/edit-expense/${expense.id}'),
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 5),
           padding: const EdgeInsets.all(14),
@@ -417,7 +439,9 @@ class _ExpenseCard extends ConsumerWidget {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 7, vertical: 2),
+                            horizontal: 7,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: catColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../providers/app_providers.dart';
 import '../../../data/models/member_model.dart';
@@ -38,8 +37,11 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
     final budgetPerHead = tripAsync.value?.budgetPerHead ?? 0.0;
 
     final totalMembers = membersAsync.value?.length ?? 0;
-    final settledCount = membersAsync.value
-            ?.where((m) => budgetPerHead > 0 && (budgetPerHead - m.amountPaid) <= 0)
+    final settledCount =
+        membersAsync.value
+            ?.where(
+              (m) => budgetPerHead > 0 && (budgetPerHead - m.amountPaid) <= 0,
+            )
             .length ??
         0;
 
@@ -63,11 +65,16 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
               padding: const EdgeInsets.only(right: 16),
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: AppColors.success.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Text(
                     '$settledCount/$totalMembers settled',
@@ -88,11 +95,18 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
             child: TextField(
-              onChanged: (v) => ref.read(memberSearchProvider.notifier).state = v,
-              style: GoogleFonts.inter(fontSize: 14, color: AppColors.textPrimary),
+              onChanged: (v) =>
+                  ref.read(memberSearchProvider.notifier).state = v,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: AppColors.textPrimary,
+              ),
               decoration: InputDecoration(
                 hintText: 'Search members...',
-                hintStyle: GoogleFonts.inter(fontSize: 14, color: AppColors.textMuted),
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: AppColors.textMuted,
+                ),
                 prefixIcon: const Icon(Icons.search_rounded, size: 20),
                 suffixIcon: search.isNotEmpty
                     ? IconButton(
@@ -101,8 +115,10 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                             ref.read(memberSearchProvider.notifier).state = '',
                       )
                     : null,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
             ),
           ),
@@ -117,10 +133,10 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                   final chipColor = f == 'paid'
                       ? AppColors.success
                       : f == 'partial'
-                          ? AppColors.warning
-                          : f == 'pending'
-                              ? AppColors.error
-                              : AppColors.primary;
+                      ? AppColors.warning
+                      : f == 'pending'
+                      ? AppColors.error
+                      : AppColors.primary;
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: GestureDetector(
@@ -148,9 +164,12 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                           f[0].toUpperCase() + f.substring(1),
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            fontWeight:
-                                selected ? FontWeight.w700 : FontWeight.w500,
-                            color: selected ? chipColor : AppColors.textSecondary,
+                            fontWeight: selected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: selected
+                                ? chipColor
+                                : AppColors.textSecondary,
                           ),
                         ),
                       ),
@@ -173,8 +192,8 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                         : 'Add your first member to get started',
                     actionLabel: search.isEmpty ? 'Add Member' : null,
                     onAction: search.isEmpty
-                        ? () => context.push(
-                            '/trip/${widget.tripId}/add-member')
+                        ? () =>
+                              context.push('/trip/${widget.tripId}/add-member')
                         : null,
                   );
                 }
@@ -199,8 +218,11 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error_outline_rounded,
-                        size: 48, color: AppColors.textMuted),
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      size: 48,
+                      color: AppColors.textMuted,
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       'Something went wrong',
@@ -242,9 +264,6 @@ class _MemberCard extends ConsumerWidget {
     final paidAmount = member.amountPaid;
     final pendingAmount = budgetPerHead - paidAmount;
     final isSettled = pendingAmount <= 0 && budgetPerHead > 0;
-    final progress = budgetPerHead > 0
-        ? (paidAmount / budgetPerHead).clamp(0.0, 1.0)
-        : 0.0;
 
     return Dismissible(
       key: Key(member.id),
@@ -307,212 +326,185 @@ class _MemberCard extends ConsumerWidget {
         onTap: () => context.push('/trip/$tripId/member/${member.id}'),
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSettled
-                  ? AppColors.success.withValues(alpha: 0.3)
-                  : AppColors.border.withValues(alpha: 0.6),
-              width: 1.5,
+                  ? AppColors.success.withValues(alpha: 0.25)
+                  : AppColors.border.withValues(alpha: 0.5),
+              width: 1,
             ),
-            boxShadow: AppColors.softShadow,
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    // Avatar
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: isSettled
-                              ? [
-                                  AppColors.success.withValues(alpha: 0.15),
-                                  AppColors.success.withValues(alpha: 0.08),
-                                ]
-                              : [
-                                  AppColors.primary.withValues(alpha: 0.12),
-                                  AppColors.primary.withValues(alpha: 0.06),
-                                ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          member.name.isNotEmpty
-                              ? member.name[0].toUpperCase()
-                              : '?',
-                          style: GoogleFonts.inter(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w800,
-                            color: isSettled
-                                ? AppColors.success
-                                : AppColors.primary,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Name + status
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            member.name,
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 3),
-                          if (isSettled)
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.check_circle_rounded,
-                                  color: AppColors.success,
-                                  size: 13,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Fully Settled',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.success,
-                                  ),
-                                ),
-                              ],
-                            )
-                          else
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  AppConstants.getPaymentStatusIcon(
-                                      member.paymentStatus),
-                                  size: 13,
-                                  color: member.paymentStatus == 'Partial'
-                                      ? AppColors.warning
-                                      : AppColors.error,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  member.paymentStatus,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: member.paymentStatus == 'Partial'
-                                        ? AppColors.warning
-                                        : AppColors.error,
-                                  ),
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                    ),
-                    // Amounts column
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        if (isSettled)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.success.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              Formatters.currency(paidAmount),
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.success,
-                              ),
-                            ),
-                          )
-                        else ...[
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Paid ',
-                                style: GoogleFonts.inter(
-                                  fontSize: 11,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                              Text(
-                                Formatters.currency(paidAmount),
-                                style: GoogleFonts.inter(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.success,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 3),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Due ',
-                                style: GoogleFonts.inter(
-                                  fontSize: 11,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                              Text(
-                                Formatters.currency(
-                                    pendingAmount > 0 ? pendingAmount : 0),
-                                style: GoogleFonts.inter(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.error,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
+          child: Row(
+            children: [
+              // Avatar
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: isSettled
+                      ? AppColors.success.withValues(alpha: 0.1)
+                      : AppColors.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
                 ),
-                // Progress bar
-                if (budgetPerHead > 0) ...[
-                  const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 5,
-                      backgroundColor: AppColors.surfaceLighter,
+                child: Center(
+                  child: Text(
+                    member.name.isNotEmpty ? member.name[0].toUpperCase() : '?',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                       color: isSettled ? AppColors.success : AppColors.primary,
                     ),
                   ),
-                ],
-              ],
-            ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Name + badge
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      member.name,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 5),
+                    _StatusBadge(
+                      isSettled: isSettled,
+                      paymentStatus: member.paymentStatus,
+                    ),
+                  ],
+                ),
+              ),
+              // Amounts
+              if (isSettled)
+                _AmountBlock(
+                  label: 'Paid',
+                  amount: paidAmount,
+                  color: AppColors.success,
+                )
+              else
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _AmountBlock(
+                      label: 'Paid',
+                      amount: paidAmount,
+                      color: AppColors.success,
+                    ),
+                    Container(
+                      width: 1,
+                      height: 28,
+                      color: AppColors.border.withValues(alpha: 0.4),
+                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                    _AmountBlock(
+                      label: 'Due',
+                      amount: pendingAmount > 0 ? pendingAmount : 0,
+                      color: AppColors.error,
+                    ),
+                  ],
+                ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _AmountBlock extends StatelessWidget {
+  final String label;
+  final double amount;
+  final Color color;
+
+  const _AmountBlock({
+    required this.label,
+    required this.amount,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.inter(fontSize: 11, color: AppColors.textMuted),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          Formatters.currency(amount),
+          style: GoogleFonts.inter(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final bool isSettled;
+  final String paymentStatus;
+
+  const _StatusBadge({required this.isSettled, required this.paymentStatus});
+
+  @override
+  Widget build(BuildContext context) {
+    final Color bg;
+    final Color fg;
+    final IconData icon;
+    final String label;
+
+    if (isSettled) {
+      bg = AppColors.success.withValues(alpha: 0.1);
+      fg = AppColors.success;
+      icon = Icons.check_circle_rounded;
+      label = 'Fully settled';
+    } else if (paymentStatus == 'Partial') {
+      bg = AppColors.warning.withValues(alpha: 0.1);
+      fg = AppColors.warning;
+      icon = Icons.timelapse_rounded;
+      label = 'Partial';
+    } else {
+      bg = AppColors.error.withValues(alpha: 0.1);
+      fg = AppColors.error;
+      icon = Icons.error_outline_rounded;
+      label = 'Pending';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: fg),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: fg,
+            ),
+          ),
+        ],
       ),
     );
   }
