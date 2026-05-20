@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/validators.dart';
@@ -169,39 +170,31 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                 spacing: 8,
                 runSpacing: 8,
                 children: AppConstants.expenseCategories.map((c) {
-                  final selected = _category == c;
-                  final color = AppColors.getCategoryColor(c);
-                  return ChoiceChip(
-                    label: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          AppConstants.getCategoryIcon(c),
-                          size: 16,
-                          color: selected ? color : AppColors.textMuted,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(c),
-                      ],
-                    ),
-                    selected: selected,
-                    onSelected: (_) => setState(() => _category = c),
-                    selectedColor: color.withValues(alpha: 0.15),
+                  return _CategoryChip(
+                    category: c,
+                    isSelected: _category == c,
+                    onTap: () => setState(() => _category = c),
                   );
                 }).toList(),
               ),
-              // Custom category field
-              if (_category == 'Extra') ...[
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _customCatCtrl,
-                  validator: (v) => Validators.required(v, 'Custom category'),
-                  decoration: const InputDecoration(
-                    labelText: 'Custom Category Name',
-                    prefixIcon: Icon(Icons.edit_rounded),
-                  ),
-                ),
-              ],
+              // Custom category field with smooth animation
+              AnimatedSize(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                child: _category == 'Extra'
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: TextFormField(
+                          controller: _customCatCtrl,
+                          validator: (v) => Validators.required(v, 'Custom category'),
+                          decoration: const InputDecoration(
+                            labelText: 'Custom Category Name',
+                            prefixIcon: Icon(Icons.edit_rounded),
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
               const SizedBox(height: 16),
               // Date & time row
               Row(
@@ -299,6 +292,85 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CategoryChip extends StatelessWidget {
+  final String category;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _CategoryChip({
+    required this.category,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = AppColors.getCategoryColor(category);
+    final icon = AppConstants.getCategoryIcon(category);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withValues(alpha: 0.08) : AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? color : AppColors.border,
+            width: isSelected ? 1.5 : 1.0,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : AppColors.softShadow,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: isSelected ? color.withValues(alpha: 0.12) : AppColors.surfaceLight,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 15,
+                color: isSelected ? color : AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              category,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                color: isSelected ? color : AppColors.textPrimary,
+              ),
+            ),
+            if (isSelected) ...[
+              const SizedBox(width: 6),
+              Icon(
+                Icons.check_circle_rounded,
+                size: 13,
+                color: color,
+              ),
+            ],
+          ],
         ),
       ),
     );

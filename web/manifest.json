@@ -1,6 +1,6 @@
 {
-    "name": "track_tripp",
-    "short_name": "track_tripp",
+    "name": "Track Habit",
+    "short_name": "Track Habit",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
