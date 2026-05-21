@@ -25,10 +25,10 @@ class _MemberLoginScreenState extends ConsumerState<MemberLoginScreen>
   bool _loading = false;
 
   final List<String> _images = [
-    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop',
-    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&fit=crop',
-    'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&fit=crop',
-    'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&fit=crop',
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1200&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&fit=crop&q=80',
   ];
   int _currentIndex = 0;
   int _nextIndex = 1;
@@ -41,7 +41,7 @@ class _MemberLoginScreenState extends ConsumerState<MemberLoginScreen>
     super.initState();
     _fadeCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1400),
+      duration: const Duration(milliseconds: 1200),
     );
     _fadeAnim = CurvedAnimation(parent: _fadeCtrl!, curve: Curves.easeInOut);
     _startSlideshow();
@@ -79,13 +79,15 @@ class _MemberLoginScreenState extends ConsumerState<MemberLoginScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text(
+              content: Text(
                 'Invalid trip code. Please check and try again.',
+                style: GoogleFonts.inter(fontSize: 13),
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
           );
@@ -107,11 +109,15 @@ class _MemberLoginScreenState extends ConsumerState<MemberLoginScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text(
+              'Error: ${e.toString()}',
+              style: GoogleFonts.inter(fontSize: 13),
+            ),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
           ),
         );
@@ -126,13 +132,14 @@ class _MemberLoginScreenState extends ConsumerState<MemberLoginScreen>
     final mq = MediaQuery.of(context);
     final isWide = mq.size.width > 600;
     final keyboardOpen = mq.viewInsets.bottom > 100;
+    final screenHeight = mq.size.height;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Current bg image
+          // ── Background image ──
           CachedNetworkImage(
             key: ValueKey('bg_$_currentIndex'),
             imageUrl: _images[_currentIndex],
@@ -141,7 +148,7 @@ class _MemberLoginScreenState extends ConsumerState<MemberLoginScreen>
             errorWidget: (_, __, ___) =>
                 Container(color: const Color(0xFF0A1628)),
           ),
-          // Next image crossfading
+          // ── Cross-fade ──
           if (_fadeAnim != null)
             FadeTransition(
               opacity: _fadeAnim!,
@@ -153,267 +160,164 @@ class _MemberLoginScreenState extends ConsumerState<MemberLoginScreen>
                 errorWidget: (_, __, ___) => const SizedBox.shrink(),
               ),
             ),
-          // Gradient scrim — matches LoginScreen exactly
+          // ── Gradient scrim ──
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withValues(alpha: 0.15),
-                  Colors.black.withValues(alpha: 0.4),
-                  Colors.black.withValues(alpha: 0.88),
+                  Colors.black.withValues(alpha: 0.1),
+                  Colors.black.withValues(alpha: 0.35),
+                  Colors.black.withValues(alpha: 0.92),
                 ],
-                stops: const [0.0, 0.35, 1.0],
+                stops: const [0.0, 0.3, 1.0],
               ),
             ),
           ),
-          // Main content
+          // ── Content ──
           SafeArea(
             child: Column(
               children: [
-                // Hero text — collapses on keyboard open, matches LoginScreen
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 280),
-                  curve: Curves.easeInOut,
-                  child: keyboardOpen
-                      ? const SizedBox.shrink()
-                      : Padding(
-                          padding: const EdgeInsets.fromLTRB(28, 48, 28, 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Back button inline with pill (top-left)
-                              Material(
-                                color: Colors.white.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(12),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(12),
-                                  onTap: () => context.go('/login'),
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(10),
-                                    child: Icon(
-                                      Icons.arrow_back_rounded,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              // Pill badge — mirrors LoginScreen
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 7,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.3),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.group_rounded,
-                                      size: 14,
-                                      color: Colors.white,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      'Trip Member',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 12,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                'Join a\nTrip',
-                                style: GoogleFonts.inter(
-                                  fontSize: 44,
-                                  fontWeight: FontWeight.w800,
+                if (!keyboardOpen)
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(28, 36, 28, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Back button
+                          Material(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(10),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () => context.go('/login'),
+                              child: const Padding(
+                                padding: EdgeInsets.all(9),
+                                child: Icon(
+                                  Icons.arrow_back_rounded,
                                   color: Colors.white,
-                                  height: 1.05,
+                                  size: 19,
                                 ),
                               ),
-                              const SizedBox(height: 10),
-                              Text(
-                                'Enter your name and trip code',
-                                style: GoogleFonts.inter(
-                                  fontSize: 15,
-                                  color: Colors.white.withValues(alpha: 0.7),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                ),
-                const Spacer(),
-                // Bottom sheet — same structure as LoginScreen
-                SingleChildScrollView(
-                  reverse: true,
-                  padding: EdgeInsets.only(bottom: mq.viewInsets.bottom),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: isWide ? 460 : double.infinity,
+                          const SizedBox(height: 20),
+                          _MemberPillBadge(),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Join a\nTrip',
+                            style: GoogleFonts.inter(
+                              fontSize: screenHeight < 700 ? 36 : 46,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              height: 1.08,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Enter your name and trip code',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.white.withValues(alpha: 0.72),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(32),
-                          ),
-                        ),
-                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 36),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              // Drag handle
-                              Center(
-                                child: Container(
-                                  width: 44,
-                                  height: 4,
-                                  margin: const EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade300,
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
+                    ),
+                  )
+                else
+                  const SizedBox(height: 16),
+                // ── Bottom sheet ──
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: isWide ? 460 : double.infinity,
+                    maxHeight: mq.size.height * 0.72,
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(28),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.only(
+                        left: 24,
+                        right: 24,
+                        top: 16,
+                        bottom: mq.viewInsets.bottom + 32,
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Center(
+                              child: Container(
+                                width: 40,
+                                height: 4,
+                                margin: const EdgeInsets.only(bottom: 22),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE2E8F0),
+                                  borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
-                              Text(
-                                'Member Sign In',
-                                style: GoogleFonts.inter(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.grey.shade900,
-                                ),
+                            ),
+                            Text(
+                              'Member Sign In',
+                              style: GoogleFonts.inter(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF0F172A),
                               ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'View expenses & payments for your trip',
-                                style: GoogleFonts.inter(
-                                  fontSize: 13,
-                                  color: Colors.grey.shade500,
-                                ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              'View expenses & payments for your trip',
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                color: const Color(0xFF94A3B8),
+                                fontWeight: FontWeight.w400,
                               ),
-                              const SizedBox(height: 24),
-                              AuthInputField(
-                                controller: _nameController,
-                                label: 'Your Name',
-                                hint: 'Enter your full name',
-                                icon: Icons.person_outline_rounded,
-                                capitalization: TextCapitalization.words,
-                                validator: (v) =>
-                                    Validators.required(v, 'Name'),
-                              ),
-                              const SizedBox(height: 12),
-                              AuthInputField(
-                                controller: _codeController,
-                                label: 'Trip Code',
-                                hint: 'e.g. TRIP2026',
-                                icon: Icons.vpn_key_outlined,
-                                capitalization: TextCapitalization.characters,
-                                validator: Validators.tripCode,
-                                letterSpacing: 2.5,
-                              ),
-                              const SizedBox(height: 24),
-                              SizedBox(
-                                height: 52,
-                                child: ElevatedButton(
-                                  onPressed: _loading ? null : _joinTrip,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    foregroundColor: Colors.white,
-                                    disabledBackgroundColor: AppColors.primary
-                                        .withValues(alpha: 0.6),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    elevation: 0,
-                                  ),
-                                  child: _loading
-                                      ? const SizedBox(
-                                          width: 22,
-                                          height: 22,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : Text(
-                                          'Join Trip',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Divider(color: Colors.grey.shade200),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                    ),
-                                    child: Text(
-                                      'or',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 12,
-                                        color: Colors.grey.shade400,
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Divider(color: Colors.grey.shade200),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              SizedBox(
-                                height: 50,
-                                child: OutlinedButton.icon(
-                                  onPressed: () => context.go('/login'),
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: AppColors.primary,
-                                    side: BorderSide(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                  ),
-                                  icon: const Icon(
-                                    Icons.admin_panel_settings_outlined,
-                                    size: 18,
-                                  ),
-                                  label: Text(
-                                    'Sign In as Admin',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 24),
+                            AuthInputField(
+                              controller: _nameController,
+                              label: 'Your Name',
+                              hint: 'Enter your full name',
+                              icon: Icons.person_outline_rounded,
+                              capitalization: TextCapitalization.words,
+                              validator: (v) => Validators.required(v, 'Name'),
+                            ),
+                            const SizedBox(height: 12),
+                            AuthInputField(
+                              controller: _codeController,
+                              label: 'Trip Code',
+                              hint: 'e.g. TRIP2026',
+                              icon: Icons.vpn_key_outlined,
+                              capitalization: TextCapitalization.characters,
+                              validator: Validators.tripCode,
+                              letterSpacing: 2.5,
+                            ),
+                            const SizedBox(height: 24),
+                            _MemberPrimaryButton(
+                              label: 'Join Trip',
+                              loading: _loading,
+                              onTap: _joinTrip,
+                            ),
+                            const SizedBox(height: 18),
+                            const _MemberOrDivider(),
+                            const SizedBox(height: 18),
+                            _MemberSecondaryButton(
+                              icon: Icons.admin_panel_settings_outlined,
+                              label: 'Sign In as Admin',
+                              onTap: () => context.go('/login'),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -423,6 +327,144 @@ class _MemberLoginScreenState extends ConsumerState<MemberLoginScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Local widgets (private to this file) ─────────────────────────────────────
+
+class _MemberPillBadge extends StatelessWidget {
+  const _MemberPillBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.group_rounded, size: 13, color: Colors.white),
+          const SizedBox(width: 6),
+          Text(
+            'Trip Member',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MemberPrimaryButton extends StatelessWidget {
+  final String label;
+  final bool loading;
+  final VoidCallback onTap;
+
+  const _MemberPrimaryButton({
+    required this.label,
+    required this.loading,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 52,
+      child: ElevatedButton(
+        onPressed: loading ? null : onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.55),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(13),
+          ),
+          elevation: 0,
+        ),
+        child: loading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+      ),
+    );
+  }
+}
+
+class _MemberOrDivider extends StatelessWidget {
+  const _MemberOrDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Expanded(child: Divider(color: Color(0xFFE2E8F0))),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text(
+            'or',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: const Color(0xFFCBD5E1),
+            ),
+          ),
+        ),
+        const Expanded(child: Divider(color: Color(0xFFE2E8F0))),
+      ],
+    );
+  }
+}
+
+class _MemberSecondaryButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _MemberSecondaryButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 50,
+      child: OutlinedButton.icon(
+        onPressed: onTap,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          side: const BorderSide(color: Color(0xFFE2E8F0)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(13),
+          ),
+        ),
+        icon: Icon(icon, size: 17),
+        label: Text(
+          label,
+          style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }

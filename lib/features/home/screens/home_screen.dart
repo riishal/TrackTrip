@@ -46,7 +46,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         }
 
         final trip = trips.first;
-
         final currentSelected = ref.read(selectedTripIdProvider);
         if (currentSelected != trip.id) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -60,7 +59,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             index: _currentIndex,
             children: [
               AnalyticsScreen(tripId: trip.id),
-
               ExpensesScreen(tripId: trip.id),
               MembersScreen(tripId: trip.id),
             ],
@@ -96,8 +94,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 'Something went wrong',
                 style: GoogleFonts.inter(
                   color: AppColors.textSecondary,
-                  fontSize: 16,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
                 ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                e.toString(),
+                style: GoogleFonts.inter(
+                  color: AppColors.textMuted,
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -135,24 +143,25 @@ class _ModernBottomNav extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
+            blurRadius: 16,
+            offset: const Offset(0, -2),
           ),
         ],
         border: Border(
           top: BorderSide(
-            color: AppColors.border.withValues(alpha: 0.6),
+            color: const Color(0xFFE2E8F0).withValues(alpha: 0.8),
             width: 1,
           ),
         ),
       ),
       child: SafeArea(
+        top: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
             children: List.generate(items.length, (i) {
               final item = items[i];
@@ -171,17 +180,21 @@ class _ModernBottomNav extends StatelessWidget {
                       color: isSelected
                           ? AppColors.primary.withValues(alpha: 0.08)
                           : Colors.transparent,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          isSelected ? item.activeIcon : item.icon,
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.textMuted,
-                          size: 22,
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 180),
+                          child: Icon(
+                            isSelected ? item.activeIcon : item.icon,
+                            key: ValueKey(isSelected),
+                            color: isSelected
+                                ? AppColors.primary
+                                : const Color(0xFFCBD5E1),
+                            size: 22,
+                          ),
                         ),
                         const SizedBox(height: 3),
                         Text(
@@ -193,7 +206,7 @@ class _ModernBottomNav extends StatelessWidget {
                                 : FontWeight.w500,
                             color: isSelected
                                 ? AppColors.primary
-                                : AppColors.textMuted,
+                                : const Color(0xFFCBD5E1),
                           ),
                         ),
                       ],
@@ -213,6 +226,5 @@ class _NavItem {
   final IconData icon;
   final IconData activeIcon;
   final String label;
-
   _NavItem({required this.icon, required this.activeIcon, required this.label});
 }

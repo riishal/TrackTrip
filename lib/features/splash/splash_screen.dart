@@ -115,25 +115,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      gradient: AppColors.heroGradient,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.3),
-                          blurRadius: 30,
-                          spreadRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.flight_takeoff_rounded,
-                      size: 48,
-                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      image: const DecorationImage(
+                        image: AssetImage('assets/appicon.png'),
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Track Habit',
+                    'Track Trip',
                     style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w800,
@@ -141,7 +132,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Track your habits and expenses',
+                    'Track your travels and expenses',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textSecondary,
                     ),

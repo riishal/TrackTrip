@@ -40,48 +40,58 @@ class AuthInputField extends StatelessWidget {
         fontSize: 14,
         letterSpacing: letterSpacing,
         fontWeight: FontWeight.w500,
+        color: const Color(0xFF0F172A),
       ),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon, size: 20, color: Colors.grey.shade500),
+        prefixIcon: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Icon(icon, size: 18, color: const Color(0xFF94A3B8)),
+        ),
+        prefixIconConstraints: const BoxConstraints(minWidth: 48),
         suffixIcon: suffixIcon != null
             ? Padding(
-                padding: const EdgeInsets.only(right: 4),
+                padding: const EdgeInsets.only(right: 12),
                 child: suffixIcon,
               )
             : null,
         labelStyle: GoogleFonts.inter(
-          fontSize: 14,
-          color: Colors.grey.shade500,
+          fontSize: 13,
+          color: const Color(0xFF94A3B8),
+          fontWeight: FontWeight.w400,
         ),
-        hintStyle: GoogleFonts.inter(fontSize: 14, color: Colors.grey.shade400),
+        hintStyle: GoogleFonts.inter(
+          fontSize: 13,
+          color: const Color(0xFFCBD5E1),
+        ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: const Color(0xFFF8FAFC),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.error, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.error, width: 1.5),
         ),
+        errorStyle: GoogleFonts.inter(fontSize: 11, color: AppColors.error),
       ),
     );
   }
